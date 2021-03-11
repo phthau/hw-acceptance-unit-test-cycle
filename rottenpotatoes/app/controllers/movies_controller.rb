@@ -7,7 +7,11 @@ class MoviesController < ApplicationController
   end
 
   def index
+    if params[:director]
+    @movies = Movie.where(director: params[:director])
+    else
     @movies = Movie.all
+    end
   end
 
   def new
