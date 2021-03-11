@@ -7,11 +7,7 @@ class MoviesController < ApplicationController
   end
 
   def index
-    if params[:director]
-    @movies = Movie.where(director: params[:director])
-    else
     @movies = Movie.all
-    end
   end
 
   def new
@@ -40,6 +36,15 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+  end
+  
+  def director
+    @director = Movie.find(params[:id]).director
+    if @director.nil? || @director.empty?
+      redirect_to movies_path
+    else 
+      @movies = Movie.where("director = ?", @director)
+    end 
   end
 
   private

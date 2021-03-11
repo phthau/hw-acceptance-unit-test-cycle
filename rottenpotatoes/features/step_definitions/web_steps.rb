@@ -102,6 +102,16 @@ When /^(?:|I )attach the file "([^"]*)" to "([^"]*)"$/ do |path, field|
   attach_file(field, File.expand_path(path))
 end
 
+Then /^(?:|I )should see "(.*)" has no director info$/ do |text|
+  # search row 
+  page.all('#movies tbody tr').each do |tr|
+    next unless tr.has_content?(text)
+    # 4th column is for director info
+    column_value_1 = tr.all('td')[4].text
+    tr.all('td')[3].text == ""
+  end
+end 
+
 Then /^(?:|I )should see "([^"]*)"$/ do |text|
   if page.respond_to? :should
     page.should have_content(text)

@@ -19,9 +19,8 @@ module NavigationHelpers
       edit_movie_path(Movie.find_by(title: $1))
     when /^the details page for "(.*)"/ 
       movie_path(Movie.find_by(title: $1))
-    when /^the Similar Movies page for "(.*)"/ 
-      @direcotr = Movie.find_by(title: $1).director
-      movies_path(director: @director)
+    when /^the Similar Movies page for "(.*)"/
+      director_movie_path(Movie.find_by(title: $1))
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #
