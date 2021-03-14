@@ -107,7 +107,7 @@ Then /^(?:|I )should see "(.*)" has no director info$/ do |text|
   page.all('#movies tbody tr').each do |tr|
     next unless tr.has_content?(text)
     # 4th column is for director info
-    column_value_1 = tr.all('td')[4].text
+    column_value_1 = tr.all('td')[3].text
     tr.all('td')[3].text == ""
   end
 end 

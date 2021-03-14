@@ -5,6 +5,10 @@ Given /the following movies exist/ do |movies_table|
   end
 end
 
+Then /(.*) seed movies should exist/ do | n_seeds |
+  expect(Movie.count).to be n_seeds.to_i
+end
+
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.body is the entire content of the page as a string.
@@ -13,7 +17,22 @@ end
 
 When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
   rating_list.split(', ').each do |rating|
-    step %{I #{uncheck.nil? ? '' : 'un'}check "ratings_#{rating}"}
+    step %{I #{uncheck}check "ratings[#{rating}]"}
+    # step %{I #{uncheck.nil? ? '' : 'un'}check "ratings_#{rating}"}
+  end
+end
+
+Then /I should (not )?see movies of the following ratings: (.*)/ do |invisible, rating_list|
+  rating_list = rating_list.split(", ")
+  movies = Movie.select('title').where(rating: rating_list)
+  if invisible
+    movies.each do |movie|
+      expect(page).to have_no_content(movie[:title])
+    end
+  else 
+    movies.each do |movie|
+      expect(page).to have_content(movie[:title])
+    end
   end
 end
 

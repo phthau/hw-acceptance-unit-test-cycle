@@ -27,6 +27,7 @@ describe MoviesController, type: :controller do
         }
       }
       post :create, params
+      expect(Movie.find_by_title('Inception')).not_to be nil
       expect(response).to redirect_to(movies_path)
     end
   end
@@ -63,6 +64,7 @@ describe MoviesController, type: :controller do
   end
   
   describe 'show movies with same director' do
+    
     # set up data for testing
     before :all do
       @movie1 = Movie.create!(:title => 'Star Wars', :rating => 'PG', :director => 'George Lucas', :release_date => '1977-05-25')
@@ -76,11 +78,16 @@ describe MoviesController, type: :controller do
       DatabaseCleaner.clean_with(:truncation)
     end
     
-    it 'should call method to find movies with same director' do 
-      get :director, {:id => @movie2.id}
-      # method call successfully
+    it 'should call the method to find movies with same director' do 
+      get :director, {:id => @movie1.id}
+      # test the controller method associates with the route
       expect(response.status).to eq(200)
     end
+    
+    it 'should find and return all movies of the same director' do 
+      # test the model method with_director
+      expect(Movie.with_director('George Lucas')).to eq [@movie1, @movie4]
+    end 
     
     it 'should redirect to home page when director is empty' do 
       # @movie3 does not have a director 
@@ -89,11 +96,16 @@ describe MoviesController, type: :controller do
       expect(response).to redirect_to(movies_path)
     end 
     
-    it 'should render a page with all movies of the same director' do 
+    it 'should return all movies of the same director' do 
       # @movie1 and @movie 4 have the same director
       get :director, {:id => @movie1.id}
       expect(assigns(:movies)).to eq [@movie1, @movie4]
-      expect(response).to render_template(:director)
     end
+    
+    it 'should render the #director page if director exists' do 
+      get :director, {:id => @movie1.id}
+      expect(response).to render_template(:director)
+    end 
+    
   end
 end

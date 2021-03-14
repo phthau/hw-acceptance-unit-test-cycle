@@ -7,7 +7,29 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+     # initialize variables
+    @all_ratings = Movie.all_ratings
+    
+    # detect if it is the first time on home. if yes, clear session
+    if !params[:returning]
+      session.clear
+      session[:filter]= []
+      session[:sort] = nil
+    end 
+    
+    # update session
+    if params[:commit] # if form is submitted
+      # set to empty array if none is selected
+      session[:filter] = params[:ratings] ? params[:ratings].keys : []
+    end
+    if params[:sort] # if sorting setting is not provided, default is nil
+      session[:sort] = params[:sort] 
+    end
+    
+    @ratings_to_show = session[:filter]
+    @sort = session[:sort]
+
+    @movies = Movie.with_ratings(@ratings_to_show, @sort)
   end
 
   def new
@@ -40,10 +62,10 @@ class MoviesController < ApplicationController
   
   def director
     @director = Movie.find(params[:id]).director
-    if @director.nil? || @director.empty?
+    if @director.nil? || @director.blank?
       redirect_to movies_path
     else 
-      @movies = Movie.where("director = ?", @director)
+      @movies = Movie.with_director(@director)
     end 
   end
 
